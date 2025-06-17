@@ -2,15 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>METACO Mining Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bitcoin Mining Dashboard</title>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
       background-color: #0d0f14;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #f5f5f5;
-      margin: 0;
-      padding: 0;
+      display: flex;
     }
     header {
       background-color: #1b1f27;
@@ -19,206 +23,224 @@
       font-size: 24px;
       font-weight: bold;
       color: #f2a900;
+      width: 100%;
     }
-    .dashboard {
+    #sidebar {
+      width: 200px;
+      background: #1b1f27;
+      min-height: 100vh;
       padding: 20px;
+      transition: transform 0.3s ease;
     }
-    .main-image {
-      text-align: center;
-      margin-bottom: 20px;
+    #sidebar.hidden {
+      display: none;
     }
-    .main-image img {
-      max-width: 100%;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #000;
+    #sidebar button {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      background: #f2a900;
+      color: black;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
-    .stat-box {
+    #main {
+      flex: 1;
+      padding: 20px;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    .toggle-btn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: none;
+      border: none;
+      color: #f2a900;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 999;
+    }
+    .stat-box, .live-activity {
       background: #1e222c;
       border-radius: 10px;
       padding: 15px;
       margin-bottom: 20px;
-      text-align: center;
     }
     .stat-box h3 {
-      margin: 0 0 10px;
       font-size: 18px;
       color: #f2a900;
     }
-    .live-mining {
-      background: #161a20;
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 30px;
-    }
-    .live-mining h2 {
-      color: #f2a900;
-      text-align: center;
-    }
-    .mining-amount {
-      font-size: 28px;
+    .stat-box button {
       margin-top: 10px;
-      text-align: center;
+      background: #f2a900;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      color: black;
+      cursor: pointer;
     }
-    .mining-images {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-    .mining-images img {
-      width: 100px;
-      height: 70px;
-      object-fit: cover;
-      border-radius: 6px;
-      box-shadow: 0 0 6px #000;
-    }
-    .withdrawals {
-      margin-top: 30px;
-      background: #1e222c;
-      padding: 20px;
-      border-radius: 10px;
-    }
-    .withdrawals h3 {
-      margin-bottom: 15px;
-    }
-    .withdrawal-entry {
-      border-bottom: 1px solid #333;
-      padding: 10px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .claim-popup {
+    .popup, .overlay {
+      display: none;
       position: fixed;
+      z-index: 1000;
+    }
+    .overlay {
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+    }
+    .popup {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: #1b1f27;
       padding: 25px;
       border-radius: 10px;
-      display: none;
-      flex-direction: column;
-      gap: 15px;
-      box-shadow: 0 0 20px #000;
-      z-index: 1000;
+      text-align: center;
+      width: 90%;
+      max-width: 350px;
     }
-    .claim-popup input {
-      padding: 10px;
-      border-radius: 5px;
-      border: none;
-      background: #2b2f38;
-      color: #fff;
-    }
-    .claim-popup button {
+    .popup button {
       background: #f2a900;
       border: none;
       padding: 10px;
-      color: #000;
-      border-radius: 5px;
+      border-radius: 6px;
+      margin-top: 15px;
+      cursor: pointer;
+      color: black;
+    }
+    .popup .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 20px;
+      color: #fff;
       cursor: pointer;
     }
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      z-index: 999;
+
+    body.sidebar-hidden #main {
+      width: 100vw;
+    }
+    body.sidebar-shown #main {
+      width: calc(100vw - 200px);
     }
   </style>
 </head>
-<body>
-  <header>
-    <img src="https://em-content.zobj.net/thumbs/120/apple/354/rocket_1f680.png" width="24" style="vertical-align:middle; margin-right:8px;" />
-    METACO Mining Dashboard
-  </header>
+<body class="sidebar-hidden">
 
-  <div class="dashboard">
-    <div class="main-image">
-      <img src="https://www.investopedia.com/thmb/mSPhP1EK9aR4Zp0ylShw9fTstB4=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/bitcoin-mining_GettyImages-1232742736-91ab701b67444fa982d657a33849d8d1.jpg" alt="Bitcoin Mining Rig">
-    </div>
+  <!-- Sidebar -->
+  <div id="sidebar" class="hidden">
+    <button onclick="goHome()">🏠 Home</button>
+    <button onclick="showDepositPopup(); hideSidebar()">💰 Deposit Now</button>
+  </div>
 
-    <div class="stat-box">
-      <h3>Total Members:</h3>
-      <div id="member-count">4,567,227</div>
-    </div>
+  <!-- Main Dashboard -->
+  <div id="main">
+    <button class="toggle-btn" id="toggleSidebar">☰</button>
+    <header>Bitcoin Mining Dashboard</header>
+
     <div class="stat-box">
       <h3>Your Balance</h3>
-      <div>$100</div>
+      <div style="font-size: 24px; margin-top: 5px;">$0.26</div>
+      <button onclick="showClaimForm()">Claim Now</button>
     </div>
 
-    <div class="live-mining">
-      <h2>Live Bitcoin Mining</h2>
-      <div class="mining-amount" id="mining-amount">Mining in progress... 0.000043 BTC</div>
-      <div class="mining-images">
-        <img src="https://cryptopotato.com/wp-content/uploads/2019/12/bitcoin_mining_machines-min.jpg" alt="Mining Machine">
-        <img src="https://media.wired.com/photos/5d305cdc7431e60008b8f8a1/master/w_2560%2Cc_limit/Bitcoin-mining.jpg" alt="Mining Setup">
-        <img src="https://miro.medium.com/v2/resize:fit:1400/format:webp/1*EKytYKygk5XZUzzMdOEg2g.jpeg" alt="Crypto Rigs">
-      </div>
+    <div class="stat-box">
+      <h3>Total Members</h3>
+      <div id="member-count">4,567,232</div>
     </div>
 
-    <div class="withdrawals">
-      <h3>Live Withdrawals</h3>
-      <div id="withdrawal-list"></div>
+    <div class="live-activity">
+      <h3 style="color: #f2a900; margin-bottom: 10px;">Live Activity</h3>
+      <div id="activity-feed"></div>
     </div>
   </div>
 
-  <div class="overlay" id="overlay"></div>
-  <div class="claim-popup" id="claimPopup">
-    <input type="text" placeholder="Username" />
-    <input type="text" placeholder="Passphrase" />
-    <input type="text" placeholder="Wallet Address" />
-    <button onclick="claimNow()">Claim Now</button>
+  <!-- Deposit Popup -->
+  <div class="overlay" id="depositOverlay" onclick="hideDepositPopup()"></div>
+  <div class="popup" id="depositPopup">
+    <span class="close-btn" onclick="hideDepositPopup()">×</span>
+    <div style="font-size: 20px; margin-bottom: 10px;">🎉</div>
+    <div>🎁 Deposit $10 and get up to 0.26 BTC FREE!</div>
+    <button onclick="window.location.href='https://paystack.com/pay/example'">Deposit Now</button>
+  </div>
+
+  <!-- Claim Popup -->
+  <div class="overlay" id="claimOverlay" onclick="hideClaimForm()"></div>
+  <div class="popup" id="claimPopup">
+    <span class="close-btn" onclick="hideClaimForm()">×</span>
+    <h3>Select Payment Method</h3>
+    <select style="width: 100%; padding: 8px; margin: 10px 0;">
+      <option>Credit Card</option>
+      <option>PayPal</option>
+      <option>PalmPay</option>
+      <option>CashApp</option>
+    </select>
+    <button onclick="window.location.href='https://paystack.com/pay/example'">Continue</button>
   </div>
 
   <script>
-    let count = 4567227;
+    const toggleBtn = document.getElementById("toggleSidebar");
+    const sidebar = document.getElementById("sidebar");
+
+    toggleBtn.onclick = () => {
+      sidebar.classList.remove("hidden");
+      document.body.classList.remove("sidebar-hidden");
+      document.body.classList.add("sidebar-shown");
+    };
+
+    function hideSidebar() {
+      sidebar.classList.add("hidden");
+      document.body.classList.add("sidebar-hidden");
+      document.body.classList.remove("sidebar-shown");
+    }
+
+    function goHome() {
+      alert("Redirecting to Home (Fake)");
+      hideSidebar();
+    }
+
+    function showDepositPopup() {
+      document.getElementById("depositOverlay").style.display = "block";
+      document.getElementById("depositPopup").style.display = "block";
+    }
+
+    function hideDepositPopup() {
+      document.getElementById("depositOverlay").style.display = "none";
+      document.getElementById("depositPopup").style.display = "none";
+    }
+
+    function showClaimForm() {
+      document.getElementById("claimOverlay").style.display = "block";
+      document.getElementById("claimPopup").style.display = "block";
+    }
+
+    function hideClaimForm() {
+      document.getElementById("claimOverlay").style.display = "none";
+      document.getElementById("claimPopup").style.display = "none";
+    }
+
+    let count = 4567232;
     setInterval(() => {
       count += Math.floor(Math.random() * 3);
       document.getElementById("member-count").textContent = count.toLocaleString();
     }, 5000);
 
-    function updateMining() {
-      const btc = (Math.random() * 0.01).toFixed(6);
-      document.getElementById("mining-amount").textContent = `Mining in progress... ${btc} BTC`;
-    }
-    setInterval(updateMining, 6000);
-
-    const names = ["John", "Alice", "Carlos", "Fatima", "Li Wei", "Omar", "Maya", "James", "Sophia"];
-    const countries = ["🇺🇸", "🇬🇧", "🇨🇦", "🇳🇬", "🇮🇳", "🇧🇷", "🇩🇪", "🇨🇳", "🇿🇦"];
-    const withdrawalList = document.getElementById("withdrawal-list");
-    const maxEntries = 5000;
-    let currentEntries = 0;
-    function addWithdrawal() {
-      if (currentEntries >= maxEntries) return;
+    const names = ["Angela R.", "Carlos L.", "James K.", "Fatima S.", "Wei C."];
+    const feed = document.getElementById("activity-feed");
+    function addActivity() {
       const name = names[Math.floor(Math.random() * names.length)];
-      const country = countries[Math.floor(Math.random() * countries.length)];
-      const amount = "$100.00";
+      const type = Math.random() < 0.5 ? "withdrew" : "deposited $10 and received";
       const entry = document.createElement("div");
-      entry.className = "withdrawal-entry";
-      entry.innerHTML = `<span>${country} ${name}</span><span>${amount}</span>`;
-      withdrawalList.insertBefore(entry, withdrawalList.firstChild);
-      currentEntries++;
+      entry.style.padding = "5px 0";
+      entry.textContent = `${name} ${type} 0.26 BTC`;
+      feed.insertBefore(entry, feed.firstChild);
     }
-    setInterval(addWithdrawal, 4000);
-
-    window.onload = function () {
-      setTimeout(() => {
-        document.getElementById("claimPopup").style.display = "flex";
-        document.getElementById("overlay").style.display = "block";
-      }, 2500);
-    };
-
-    function claimNow() {
-      alert("$100 Claimed Successfully! Now invite 5 people and pay $5 to unlock full features.");
-      document.querySelector(".stat-box:nth-child(2) div").textContent = "$0";
-      document.getElementById("claimPopup").style.display = "none";
-      document.getElementById("overlay").style.display = "none";
-      window.location.href = "https://paystack.com/pay/example"; // 🔁 Replace with real payment link
-    }
+    setInterval(addActivity, 4000);
   </script>
 </body>
 </html>
