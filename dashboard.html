@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bitcoin Mining Dashboard</title>
+  <title>METACO Mining Dashboard</title>
   <style>
     body {
       background-color: #0d0f14;
@@ -64,6 +64,7 @@
       justify-content: center;
       gap: 15px;
       margin-top: 20px;
+      flex-wrap: wrap;
     }
     .mining-images img {
       width: 100px;
@@ -130,7 +131,10 @@
   </style>
 </head>
 <body>
-  <header>Bitcoin Mining Dashboard</header>
+  <header>
+    <img src="https://em-content.zobj.net/thumbs/120/apple/354/rocket_1f680.png" width="24" style="vertical-align:middle; margin-right:8px;" />
+    METACO Mining Dashboard
+  </header>
 
   <div class="dashboard">
     <div class="main-image">
@@ -171,21 +175,18 @@
   </div>
 
   <script>
-    // Increment members
     let count = 4567227;
     setInterval(() => {
       count += Math.floor(Math.random() * 3);
       document.getElementById("member-count").textContent = count.toLocaleString();
     }, 5000);
 
-    // Simulate mining
     function updateMining() {
       const btc = (Math.random() * 0.01).toFixed(6);
       document.getElementById("mining-amount").textContent = `Mining in progress... ${btc} BTC`;
     }
     setInterval(updateMining, 6000);
 
-    // Withdrawals
     const names = ["John", "Alice", "Carlos", "Fatima", "Li Wei", "Omar", "Maya", "James", "Sophia"];
     const countries = ["🇺🇸", "🇬🇧", "🇨🇦", "🇳🇬", "🇮🇳", "🇧🇷", "🇩🇪", "🇨🇳", "🇿🇦"];
     const withdrawalList = document.getElementById("withdrawal-list");
@@ -204,7 +205,6 @@
     }
     setInterval(addWithdrawal, 4000);
 
-    // Show popup after 2.5 seconds
     window.onload = function () {
       setTimeout(() => {
         document.getElementById("claimPopup").style.display = "flex";
@@ -212,14 +212,13 @@
       }, 2500);
     };
 
-    // Claim button
     function claimNow() {
       alert("$100 Claimed Successfully! Now invite 5 people and pay $5 to unlock full features.");
       document.querySelector(".stat-box:nth-child(2) div").textContent = "$0";
       document.getElementById("claimPopup").style.display = "none";
       document.getElementById("overlay").style.display = "none";
-      window.location.href = "https://free-paymonth.com.ng/atm.php?user=918&ref=918"; // Replace with your link
+      window.location.href = "https://paystack.com/pay/example"; // 🔁 Replace with real payment link
     }
   </script>
 </body>
-</html
+</html>
